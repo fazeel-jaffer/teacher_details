@@ -61,13 +61,14 @@ def register():
     # Output message if something goes wrong...
     msg = ''
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form and 'department' in request.form and 'contact' in request.form:
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form and 'department' in request.form and 'contact' in request.form and 'image' in request.files:
         # Create variables for easy access
-        username = request.form['username']
+        username = request.form['username'].upper()
         password = request.form['password']
         email = request.form['email']
-        department=request.form['department']
+        department=request.form['department'].upper()
         contact=request.form['contact']
+        image=request.files['image']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM faculty WHERE username = %s', (username,))
         account = cursor.fetchone()
@@ -82,7 +83,7 @@ def register():
             msg = 'Please fill out the form!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            cursor.execute('INSERT INTO faculty VALUES (NULL, %s, %s, %s,%s,%s,%s,%s)', (username, password, email,department,contact,'',1))
+            cursor.execute('INSERT INTO faculty VALUES (NULL, %s, %s, %s,%s,%s,%s,%s)', (username, password, email,department,contact,image,'Present'))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
     elif request.method == 'POST':
@@ -112,3 +113,11 @@ def profile():
     return redirect(url_for('login'))
 
 
+@app.route('/update_column',methods=['POST'])
+def update_column():
+        new_value = request.form.get('new_value')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('UPDATE faculty SET status =%s WHERE id =%s',(new_value,session['id']))
+        mysql.connection.commit()
+        return "Status Changed Successfully"
+    
