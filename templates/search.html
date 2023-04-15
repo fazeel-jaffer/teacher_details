@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-	<title>Faculty</title>
+  <title>Faculty</title>
 </head>
 <style>
   * {
@@ -166,24 +166,15 @@
     </div>
 
     <div class="nav-links">
-      <a href="{{url_for('profile')}}"><i class="fas fa-user-circle"> </i> Profile</a>
-      <a href="{{url_for('search')}}"><i class="fas fa-user-circle"> </i> Search</a>
-      <a href="{{url_for('login')}}"><i class="fas fa-sign-in-alt"> </i> Login</a>
+        <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
+        <a href="{{url_for('login')}}"><i class="fas fa-sign-in-alt"> </i> Login</a>
     </div>
   </div>
   <div class="card-container">
-    {% for ele in accounts %}
-    <div class="card">
-      <img src="/static/ahsansir.jpg" alt="Profile Picture" style="max-width: 280px; text-align: center;">
-      <div class="card-info">
-        <h2>Name:{{ele.username}}</h2>
-        <p>Email:{{ele.email}}</p>
-        <p>Contact: {{ele.contact}}</p>
-        <p>Department: {{ele.department}}</p>
-        <p>Status: {{ele.status}}</p>
-      </div>
-    </div>
-    {% endfor %}
+    <form method="post" action="/search">
+      <input type="text" name="name" placeholder="Enter name of Faculty">
+      <input type="submit" value="Search">
+    </form>
   </div>
 </body>
 

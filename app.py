@@ -135,7 +135,15 @@ def home():
     accounts = cursor.fetchall()
     return render_template('allusers.html', accounts=accounts)
 
-
+@app.route('/search', methods=['GET','POST'])
+def search():
+    if request.method == 'POST':
+      name=request.form['name']
+      cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+      cursor.execute("SELECT * FROM faculty WHERE username LIKE %s", (name + '%',))
+      accounts = cursor.fetchall()
+      return render_template('searchedfaculty.html',accounts=accounts)
+    return render_template('search.html')
 @app.route('/myflaskproject/profile')
 def profile():
     # Check if user is loggedin
