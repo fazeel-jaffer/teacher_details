@@ -6,7 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-	<title>Faculty</title>
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    integrity="sha512-JU6jQTzEYEl+RdbN/6KZM7bZNTEnPG3XgekQGiTv1yCJntxmxpEZZOYRlLNFjbiexbOaKapOq3b7GB2KK1jK3Q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>Faculty</title>
 </head>
 <style>
   * {
@@ -154,7 +158,7 @@
     <input type="checkbox" id="nav-check">
     <div class="nav-header">
       <div class="nav-title">
-        Nit Srinagar Faculty  <i class="fas fa-solid fa-school"></i>
+        Nit Srinagar Faculty <i class="fas fa-solid fa-school"></i>
       </div>
     </div>
     <div class="nav-btn">
@@ -167,16 +171,16 @@
 
     <div class="nav-links">
       <a href="{{url_for('profile')}}"><i class="fas fa-user-circle"> </i> Profile</a>
-      <a href="{{url_for('search')}}"><i class="fas fa-user-circle"> </i> Search</a>
+      <a href="{{url_for('search')}}"><i class="fas fa-user-circle"></i> Search</a>
       <a href="{{url_for('login')}}"><i class="fas fa-sign-in-alt"> </i> Login</a>
     </div>
   </div>
   <div class="card-container">
     {% for ele in accounts %}
     <div class="card">
-      <img src="/static/ahsansir.jpg" alt="Profile Picture" style="max-width: 280px; text-align: center;">
+      <img src="{{ele.image_url}}" alt="Profile Picture" style="max-width: 250px;">
       <div class="card-info">
-        <h2>Name:{{ele.username}}</h2>
+        <h3>Name:{{ele.username}}</h3>
         <p>Email:{{ele.email}}</p>
         <p>Contact: {{ele.contact}}</p>
         <p>Department: {{ele.department}}</p>

@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session,make_response
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import mysql.connector
 import re
 from PIL import Image
-from io import BytesIO
+import pybase64
+import logging
 app = Flask(__name__)
 app.secret_key = "fazubazu123"
 app.config['MYSQL_HOST'] = 'localhost'
@@ -12,23 +13,66 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Fazeel@1234'
 app.config['MYSQL_DB'] = 'teacher'
 mysql = MySQL(app)
-
-
-def convertToBinaryData(filename):
-    # Convert digital data to binary format
-    with open(filename, 'rb') as file:
-        binaryData = file.read()
-    return binaryData
-
-
 @app.route('/')
 def allusers():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM faculty')
-    accounts = cursor.fetchall()
-    return render_template('allusers.html', accounts=accounts)
+    # cursor.execute('SELECT * FROM faculty')
+    # accounts = cursor.fetchall()
+    # return render_template('allusers.html', accounts=accounts)
+    cursor.execute('SELECT id, username,password,email,department,contact,image, status FROM faculty')
+    users = cursor.fetchall() 
+    # create a list of dictionaries with the user data and image URL
+    user_data = []
+    for user in users:
+        user_dict = {}
+        user_dict['id'] = user['id']
+        user_dict['username'] = user['username']
+        user_dict['email'] = user['email']
+        user_dict['contact'] = user['contact']
+        user_dict['department'] = user['department']
+        user_dict['status'] = user['status']
+        user_dict['image_url'] = '/display_image/{}'.format(user['id'])
+        user_data.append(user_dict)
+        # render the allusers.html template with the user data
+    return render_template('allusers.html', accounts=user_data)
 
-
+# @app.route('/display_image/<int:user_id>')
+# def display_image(user_id):
+#     # Fetch the image data from the database using the user ID
+#     cur = mysql.connection.cursor()
+#     cur.execute("SELECT image FROM faculty WHERE id = %s", (user_id,))
+#     row = cur.fetchone()
+#     if row and row[0]:
+#         image_data = row[0]
+#         # Create a response object with the image data and content type
+#         response = make_response(image_data)
+#         response.headers.set('Content-Type', 'image/png')
+#     else:
+#         response = make_response("Image not found")
+#         response.headers.set('Content-Type', 'text/plain')
+#     return response
+@app.route('/display_image/<int:user_id>')
+def display_image(user_id):
+    try:
+        # Fetch the image data from the database using the user ID
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT image FROM faculty WHERE id = %s", (user_id,))
+        row = cur.fetchone()
+        if row and row[0]:
+            # Decode the base64-encoded image data
+            image_data = pybase64.b64decode(row[0])
+            # Create a response object with the image data and content type
+            response = make_response(image_data)
+            response.headers.set('Content-Type', 'image/png')
+        else:
+            response = make_response("Image not found")
+            response.headers.set('Content-Type', 'text/plain')
+        return response
+    except Exception as e:
+        logging.error('Error displaying image for user ID {}: {}'.format(user_id, e))
+        response = make_response("Error displaying image")
+        response.headers.set('Content-Type', 'text/plain')
+        return response
 @app.route('/myflaskproject/', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
@@ -83,16 +127,7 @@ def register():
         email = request.form['email']
         department = request.form['department'].upper()
         contact = request.form['contact']
-        # Retrieve the image file from the form
-        img_file = request.files['image']
-        # Convert the image file to bytes
-        img_bytes = img_file.read()
-        # Convert the image bytes to a PIL image object
-        img = Image.open(BytesIO(img_bytes))
-        # Convert the PIL image to a bytes object
-        img_byte_arr = BytesIO()
-        img.save(img_byte_arr, format="PNG")
-        img_bytes = img_byte_arr.getvalue()
+        image=request.files['image']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(
             'SELECT * FROM faculty WHERE username = %s', (username,))
@@ -108,9 +143,20 @@ def register():
             msg = 'Please fill out the form!'
         else:
             # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            temp_file = 'temp.png'
+            with Image.open(image) as img:
+              img.thumbnail((280, 280))
+              img = img.convert('RGB') # convert to RGB mode
+              img.save(temp_file, 'PNG')
             sql = "INSERT INTO faculty (username, password, email, department, contact, image, status) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-            data = (username, password, email, department, contact, img_bytes, 'Present')
+            data = (username, password, email, department, contact, '', 'Present')
             cursor.execute(sql, data)
+            user_id = cursor.lastrowid
+            with open(temp_file, 'rb') as f:
+             img_data = f.read()
+             encoded_data = pybase64.b64encode(img_data)
+             update_stmt = "UPDATE faculty SET image=%s WHERE id=%s"
+            cursor.execute(update_stmt, (encoded_data, user_id))
             mysql.connection.commit()
             msg = 'You have successfully registered!'
     elif request.method == 'POST':
@@ -130,17 +176,37 @@ def register():
 
 @app.route('/myflaskproject/home')
 def home():
+    # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    # cursor.execute('SELECT * FROM faculty')
+    # accounts = cursor.fetchall()
+    # return render_template('allusers.html', accounts=accounts)
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM faculty')
-    accounts = cursor.fetchall()
-    return render_template('allusers.html', accounts=accounts)
+    # cursor.execute('SELECT * FROM faculty')
+    # accounts = cursor.fetchall()
+    # return render_template('allusers.html', accounts=accounts)
+    cursor.execute('SELECT id, username,password,email,department,contact,image, status FROM faculty')
+    users = cursor.fetchall() 
+    # create a list of dictionaries with the user data and image URL
+    user_data = []
+    for user in users:
+        user_dict = {}
+        user_dict['id'] = user['id']
+        user_dict['username'] = user['username']
+        user_dict['email'] = user['email']
+        user_dict['contact'] = user['contact']
+        user_dict['department'] = user['department']
+        user_dict['status'] = user['status']
+        user_dict['image_url'] = '/display_image/{}'.format(user['id'])
+        user_data.append(user_dict)
+        # render the allusers.html template with the user data
+    return render_template('allusers.html', accounts=user_data)
 
 @app.route('/search', methods=['GET','POST'])
 def search():
     if request.method == 'POST':
       name=request.form['name']
       cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-      cursor.execute("SELECT * FROM faculty WHERE username LIKE %s", (name + '%',))
+      cursor.execute("SELECT * FROM faculty WHERE username LIKE %s", ('%' + name + '%',))
       accounts = cursor.fetchall()
       return render_template('searchedfaculty.html',accounts=accounts)
     return render_template('search.html')
@@ -148,12 +214,30 @@ def search():
 def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
-        # We need all the account info for the user so we can display it on the profile page
+        #We need all the account info for the user so we can display it on the profile page
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM faculty WHERE id = %s', (session['id'],))
         account = cursor.fetchone()
         # Show the profile page with account info
         return render_template('profile.html', account=account)
+    #     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    #     # cursor.execute('SELECT * FROM faculty')
+    #     # accounts = cursor.fetchall()
+    #     # return render_template('allusers.html', accounts=accounts)
+    #     cursor.execute('SELECT id, username,email,department,contact,image FROM faculty WHERE id=%s',(session['id'],))
+    #     users = cursor.fetchone() 
+    #     print(users)
+    # # create a list of dictionaries with the user data and image URL
+    #     user_data = []
+    #     user_dict = {}
+    #     user_dict['id'] = users['id']
+    #     user_dict['username'] = users['username']
+    #     user_dict['email'] = users['email']
+    #     user_dict['contact'] = users['contact']
+    #     user_dict['department'] = users['department']
+    #     user_dict['image_url'] = '/display_image/{}'.format(users['id'])
+    #     user_data.append(user_dict)
+        # render the allusers.html template with the user data
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 

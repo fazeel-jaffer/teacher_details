@@ -6,6 +6,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.2/web-animations.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.2/web-animations.min.js"></script>
+
   <title>Faculty</title>
 </head>
 <style>
@@ -147,6 +150,40 @@
     padding: 10px;
     text-align: center;
   }
+  #inp{
+    border-radius: 15px;
+    height: 40px;
+    width: 400px;
+    margin-top: 15px;
+  }
+  input[type="submit"],#btn {
+  background-color: #3f4f64; /* Green background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 15px 32px; /* Padding */
+  text-align: center; /* Center text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; /* Make it a block element */
+  font-size: 16px; /* Font size */
+  cursor: pointer; /* Add cursor on hover */
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-left: 150px;
+}
+/* #inp::placeholder {
+  text-align-last: center; /* Center the placeholder text 
+ } */
+input[type="text"] {
+  border: 2px solid #ccc;
+  padding: 10px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  background-color: #f1f1f1;
+  display: block;
+}
+input[type="submit"]:hover{
+  background-color: rgba(9, 3, 3, 0.3);
+}
 </style>
 
 <body>
@@ -171,11 +208,79 @@
     </div>
   </div>
   <div class="card-container">
-    <form method="post" action="/search">
-      <input type="text" name="name" placeholder="Enter name of Faculty">
+    <form method="post" action="/search" id="myForm">
+      <input type="text" name="name" placeholder="Search" id="inp">
       <input type="submit" value="Search">
+      <!-- <button id="btn" onclick="startDictation()">Start</button> -->
     </form>
   </div>
 </body>
+<script>
+  function repeat(message) {
+    let text;
+    if (message === "") {
+        text = "Please speak";
+    } else {
+        text = "You said " + message;
+    }
+    const msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "hi-IN";
+    const voices = speechSynthesis.getVoices().filter(voice => voice.lang === "hi-IN");
+    msg.voice = voices[0];
+    msg.volume = 1;
+    msg.rate = 0.8;
+    msg.pitch = 1;
+    window.speechSynthesis.cancel(msg);
+    window.speechSynthesis.speak(msg);
 
+}
+// audio to text
+let ans = new Array();
+// Define a function to start speech recognition
+function audioToText(i) {
+    let message = "";
+    const recognition = new webkitSpeechRecognition() || window.SpeechRecognition();
+    recognition.interimResults = true;
+    recognition.lang = 'en-IN';
+
+    // Set up event listeners for the Web Speech API
+    recognition.addEventListener('start', () => {
+        // Display a message when recognition starts
+        document.getElementById('recognition-status').textContent = '🔴 Voice Recognition started';
+    });
+    recognition.addEventListener('result', (event) => {
+        // Get the transcribed text
+        const transcript = event.results[0][0].transcript;
+
+        // Display the transcribed text
+        // document.getElementById('text' + i).textContent = transcript;
+        message = transcript;
+        message = message.toLowerCase();
+        document.getElementById("inp").innerText=message;
+        if (message[message.length - 1] === ".") {
+            message = message.slice(0, -1);
+        }
+        
+        // Check if the recognition process has completed
+        if (event.results[0].isFinal) {
+            // Stop recognition if the process has completed
+            recognition.stop();
+        }
+    });
+    recognition.addEventListener('end', () => {
+        // Display a message when recognition ends
+        document.getElementById('recognition-status').textContent = '🟢 Voice Recognition ended';
+        if(ans.indexOf(message)==-1){
+            ans.push(message);
+        }
+        repeat(message);
+        document.getElementById("text").innerHTML = "Record next name";
+    });
+    recognition.start();
+    // Stop recognition after 4 seconds
+    setTimeout(() => {
+    recognition.stop();
+  }, 5000);
+}
+</script>
 </html>
