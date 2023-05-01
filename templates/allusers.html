@@ -10,6 +10,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     integrity="sha512-JU6jQTzEYEl+RdbN/6KZM7bZNTEnPG3XgekQGiTv1yCJntxmxpEZZOYRlLNFjbiexbOaKapOq3b7GB2KK1jK3Q=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+    crossorigin="anonymous" />
   <title>Faculty</title>
 </head>
 <style>
@@ -119,7 +123,7 @@
     }
   }
 
-  .card-container {
+  /* .card-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
@@ -150,6 +154,217 @@
   .card-info {
     padding: 10px;
     text-align: center;
+  } */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .card {
+    max-width: 300px;
+    margin: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 100%;
+    height: 200px;
+    border-radius: 5px 5px 0 0;
+    object-fit: cover;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 32px;
+    color: #333;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  th,
+  td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #f2f2f2;
+    font-weight: normal;
+  }
+
+  td img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  @media screen and (max-width: 600px) {
+    .card {
+      max-width: 100%;
+    }
+
+    .avatar {
+      width: 150px;
+      height: 150px;
+      margin-top: -75px;
+    }
+
+    h1 {
+      font-size: 28px;
+    }
+
+    table {
+      font-size: 14px;
+    }
+  }
+
+  footer {
+    background-color: #4b365d;
+    color: #a7a7a7;
+    font-size: 16px;
+  }
+
+  footer * {
+    font-family: "Poppins", sans-serif;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+  }
+
+  .row {
+    padding: 1em 1em;
+  }
+
+  .row.primary {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    align-items: stretch;
+  }
+
+  .column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 2em;
+    min-height: 15em;
+  }
+
+  h3 {
+    width: 100%;
+    text-align: left;
+    color: white;
+    font-size: 1.4em;
+    white-space: nowrap;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+  }
+
+  li:not(:first-child) {
+    margin-top: 0.8em;
+  }
+
+  ul li a {
+    color: #a7a7a7;
+    text-decoration: none;
+  }
+
+  ul li a:hover {
+    color: #2a8ded;
+  }
+
+  .about p {
+    text-align: justify;
+    line-height: 2;
+    margin: 0;
+  }
+
+  input,
+  button {
+    font-size: 1em;
+    padding: 1em;
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 5px;
+  }
+
+  button {
+    background-color: #c7940a;
+    color: #ffffff;
+  }
+
+  div.social {
+    display: flex;
+    justify-content: space-around;
+    font-size: 2.4em;
+    flex-direction: row;
+    margin-top: 0.5em;
+  }
+
+  .social i {
+    color: #bac6d9;
+  }
+
+  .copyright {
+    padding: 0.3em 1em;
+    background-color: #3f4f64;
+  }
+
+  .footer-menu {
+    float: left;
+    margin-top: 10px;
+  }
+
+  .footer-menu a {
+    color: #cfd2d6;
+    padding: 6px;
+
+    text-decoration: none;
+  }
+
+  .footer-menu a:hover {
+    color: #27bcda;
+  }
+
+  .copyright p {
+    font-size: 0.9em;
+    text-align: right;
+  }
+
+  @media screen and (max-width: 850px) {
+    .row.primary {
+      grid-template-columns: 1fr;
+    }
+
   }
 </style>
 
@@ -169,15 +384,25 @@
       </label>
     </div>
 
+    <!-- {% if session.loggedIn %}
+<li><a href="{{ url_for('logout') }}">Logout</a></li>
+{% else %}
+<li><a href="{{ url_for('login') }}">Login</a></li>
+{% endif %} -->
+
     <div class="nav-links">
-      <a href="{{url_for('profile')}}"><i class="fas fa-user-circle"> </i> Profile</a>
-      <a href="{{url_for('search')}}"><i class="fas fa-user-circle"></i> Search</a>
+      <a href="{{url_for('profile')}}"><i class="fas fa-user-circle"> </i> User</a>
+      <a href="{{url_for('search')}}"><i class="fas fa-search"></i> Search</a>
+      {% if session.loggedin %}
+      <a href="{{url_for('logout')}}"><i class="fas fa-sign-out-alt"> </i> Logout</a>
+      {% else %}
       <a href="{{url_for('login')}}"><i class="fas fa-sign-in-alt"> </i> Login</a>
+      {% endif %}
     </div>
   </div>
-  <div class="card-container">
+  <div class="container">
     {% for ele in accounts %}
-    <div class="card">
+    <!-- <div class="card">
       <img src="{{ele.image_url}}" alt="Profile Picture" style="max-width: 250px;">
       <div class="card-info">
         <h3>Name:{{ele.username}}</h3>
@@ -186,9 +411,42 @@
         <p>Department: {{ele.department}}</p>
         <p>Status: {{ele.status}}</p>
       </div>
+    </div> -->
+    <div class="card">
+      <img class="avatar" src="{{ele.image_url}}" alt="User Avatar">
+      <h1>{{ele.username}}</h1>
+      <table>
+        <tr>
+          <th>Email</th>
+          <td>{{ele.email}}</td>
+        </tr>
+        <tr>
+          <th>Contact</th>
+          <td>{{ele.contact}}</td>
+        </tr>
+        <tr>
+          <th>Department</th>
+          <td>{{ele.department}}</td>
+        </tr>
+        <tr>
+          <th>Status</th>
+          <td>{{ele.status}}</td>
+        </tr>
+      </table>
     </div>
     {% endfor %}
   </div>
+  <footer>
+    <div class="row copyright">
+      <div class="footer-menu">
+
+        <a href="https://nitsri.ac.in/"><i class="fas fa-graduation-cap"></i> Nit Srinagar</a>
+        <a href="{{url_for('about')}}"> <i class="fas fa-user-circle"> </i> About Me</a>
+        <a href="{{url_for('contact')}}"> <i class="fas fa-envelope"> </i> Contact</a>
+      </div>
+      <p>Copyright &copy; 2023</p>
+    </div>
+  </footer>
 </body>
 
 </html>

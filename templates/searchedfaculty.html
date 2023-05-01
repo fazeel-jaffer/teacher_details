@@ -176,7 +176,7 @@
         {% else %}
         {% for ele in accounts %}
         <div class="card">
-            <img src="/static/ahsansir.jpg" alt="Profile Picture" style="max-width: 280px; text-align: center;">
+            <img src="{{ele.image_url}}" alt="Profile Picture" style="max-width: 280px; text-align: center;">
             <div class="card-info">
                 <h2>Name:{{ele.username}}</h2>
                 <p>Email:{{ele.email}}</p>
