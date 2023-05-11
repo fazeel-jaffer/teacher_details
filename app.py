@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, make_response,flash
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import mysql.connector
@@ -8,6 +8,8 @@ import pybase64
 import logging
 import smtplib
 from email.message import EmailMessage
+from flask_mail import Mail, Message
+from forms import ContactForm
 app = Flask(__name__)
 app.secret_key = "fazubazu123"
 app.config['MYSQL_HOST'] = 'localhost'
@@ -15,7 +17,12 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Fazeel@1234'
 app.config['MYSQL_DB'] = 'teacher'
 mysql = MySQL(app)
-
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 465
+app.config["MAIL_USE_SSL"] = True
+app.config["MAIL_USERNAME"] = ''
+app.config["MAIL_PASSWORD"] = ''
+mail=Mail(app)
 
 @app.route('/')
 def allusers():
@@ -81,8 +88,6 @@ def display_image(user_id):
         response = make_response("Error displaying image")
         response.headers.set('Content-Type', 'text/plain')
         return response
-
-
 @app.route('/myflaskproject/', methods=['GET', 'POST'])
 def login():
     # Output message if something goes wrong...
@@ -305,27 +310,44 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/contact', methods=['GET', 'POST'])
+# @app.route('/contact', methods=['GET', 'POST'])
+# def contact():
+#     if request.method == 'POST':
+#         name = request.form['name']
+#         email = request.form['email']
+#         message = request.form['message']
+
+#         # Compose the email
+#         msg = EmailMessage()
+#         msg.set_content(message)
+#         msg['Subject'] = f'New message from {name}'
+#         msg['From'] = email
+#         msg['To'] = 'demo@gmail.com'
+
+#         # Send the email
+#         server = smtplib.SMTP('smtp.gmail.com', 587)
+#         server.starttls()
+#         server.login('', '')
+#         server.send_message(msg)
+#         server.quit()
+
+#         return 'Thank you for your message!'
+
+#     return render_template('contact.html')
+@app.route('/contact')
 def contact():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        message = request.form['message']
+    return render_template('contact.html', message_sent=False,form=ContactForm())
+@app.route('/contact', methods=['POST'])
+def handle_contact_form():
+    name = request.form['name']
+    email = request.form['email']
+    message = request.form['message']
 
-        # Compose the email
-        msg = EmailMessage()
-        msg.set_content(message)
-        msg['Subject'] = f'New message from {name}'
-        msg['From'] = email
-        msg['To'] = 'demo@gmail.com'
+    # Create a Message object with the form data and send the email
+    msg = Message(subject=f'New message from {name}',
+                  sender=email,
+                  recipients=['my@gmail.com']) # Replace with your email address
+    msg.body = f"Name: {name}\nEmail: {email}\nMessage: {message}"
+    mail.send(msg)
 
-        # Send the email
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login('', '')
-        server.send_message(msg)
-        server.quit()
-
-        return 'Thank you for your message!'
-
-    return render_template('contact.html')
+    return "Thank you for contacting us!"

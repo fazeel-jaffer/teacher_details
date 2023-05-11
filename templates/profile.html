@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 {% block title %}Profile{% endblock %}
+{% block navtop %}
+    <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
+    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
+{% endblock %}
 {% block content %}
 <div class="card-container">
   <div class="card">

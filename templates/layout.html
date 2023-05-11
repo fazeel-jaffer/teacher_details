@@ -23,8 +23,10 @@
 			<div>
 				<h1>Faculty Details</h1>
                 <!-- <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a> -->
+				{% block navtop %}
 				<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
 				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
+				{% endblock %}
 			</div>
 		</nav>
 		<div class="content">
